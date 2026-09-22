@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react"
+import { createPortal } from "react-dom"
 import type { FormEvent, MouseEvent, ReactNode } from "react"
 import Scene from "@/three/Scene"
 import { startScrollTracking } from "@/scroll"
@@ -15,9 +16,11 @@ import {
   skills,
   type Project,
 } from "@/data/cv"
+import { aiProject } from "@/data/aiProject"
 
 const NAV = [
   { id: "about", label: "About" },
+  { id: "ai-project", label: "AI Project" },
   { id: "fullstack", label: "Work" },
   { id: "testing", label: "QA" },
   { id: "skills", label: "Skills" },
@@ -535,6 +538,271 @@ function CaseStudyModal({ project, onClose }: { project: Project; onClose: () =>
   )
 }
 
+/* ── AI project (Final Year Project) ────────────────────────── */
+
+function AIProjectCard() {
+  const [caseOpen, setCaseOpen] = useState(false)
+  const [mouse, setMouse] = useState({ x: 0, y: 0 })
+  const p = aiProject
+
+  const handleMove = (event: MouseEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect()
+    const x = ((event.clientX - rect.left) / rect.width - 0.5) * 2
+    const y = ((event.clientY - rect.top) / rect.height - 0.5) * 2
+    setMouse({ x, y })
+  }
+
+  return (
+    <article className="rounded-3xl border border-pink/40 bg-white/80 p-6 shadow-xl shadow-pink/10 backdrop-blur-sm md:p-9">
+      <div className="grid items-start gap-8 md:grid-cols-2">
+        <div>
+          <span className="inline-flex items-center gap-2 rounded-full bg-pink px-3 py-1 text-xs tracking-wide text-cream">
+            <span className="h-1.5 w-1.5 rounded-full bg-cream" />
+            Final Year Project
+          </span>
+          <h3 className="mt-4 font-display text-3xl text-ink">{p.name}</h3>
+          <p className="mt-1 font-display text-lg italic text-pink">{p.kind}</p>
+
+          <p className="mt-5 leading-relaxed text-ink/80">{p.blurb}</p>
+
+          <ul className="mt-5 space-y-2.5">
+            {p.points.map((point) => (
+              <li
+                key={point}
+                className="leading-relaxed text-ink/65 before:mr-3 before:text-pink before:content-['—']"
+              >
+                {point}
+              </li>
+            ))}
+          </ul>
+
+          <ul className="mt-6 flex flex-wrap gap-2">
+            {p.stack.map((tech) => (
+              <li
+                key={tech}
+                className="rounded-full border border-pink/35 bg-blush/60 px-3 py-0.5 text-xs text-plum"
+              >
+                {tech}
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-7 flex flex-wrap items-center gap-3">
+            <a
+              href={p.live}
+              target="_blank"
+              rel="noreferrer"
+              className="rounded-full bg-pink px-5 py-2 text-sm text-cream transition-opacity hover:opacity-85"
+            >
+              View live
+            </a>
+            <button
+              type="button"
+              onClick={() => setCaseOpen(true)}
+              className="rounded-full border border-plum/40 px-5 py-2 text-sm text-plum transition-colors hover:bg-plum hover:text-cream"
+            >
+              Case study
+            </button>
+            <a
+              href={p.github}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-2 rounded-full border border-ink/25 px-5 py-2 text-sm text-ink transition-colors hover:border-pink hover:text-pink"
+            >
+              <GitHubIcon />
+              GitHub
+            </a>
+          </div>
+        </div>
+
+        <div className="overflow-hidden rounded-2xl border border-ink/12 bg-white/85">
+          <div className="flex items-center gap-1.5 border-b border-ink/10 bg-blush/50 px-3 py-2.5">
+            <span className="h-2 w-2 rounded-full bg-pink/60" />
+            <span className="h-2 w-2 rounded-full bg-ink/15" />
+            <span className="h-2 w-2 rounded-full bg-ink/15" />
+            <span className="ml-3 truncate text-[11px] text-ash">
+              {p.live.replace(/^https?:\/\//, "").replace(/\/$/, "")}
+            </span>
+          </div>
+          <div
+            onMouseMove={handleMove}
+            onMouseLeave={() => setMouse({ x: 0, y: 0 })}
+            className="aspect-[16/10] overflow-hidden bg-cream"
+          >
+            <img
+              src={p.cover}
+              alt={`${p.name} screenshot`}
+              loading="lazy"
+              style={{
+                transform: `scale(1.08) translate(${mouse.x * -8}px, ${mouse.y * -6}px)`,
+                transition: "transform 300ms ease-out",
+              }}
+              className="h-full w-full object-cover object-left-top"
+            />
+          </div>
+        </div>
+      </div>
+
+      {caseOpen ? <AIProjectCaseStudy onClose={() => setCaseOpen(false)} /> : null}
+    </article>
+  )
+}
+
+function Shot({ src, caption }: { src: string; caption: string }) {
+  return (
+    <figure className="mt-4 overflow-hidden rounded-2xl border border-ink/10 bg-white">
+      <img src={src} alt={caption} loading="lazy" className="w-full" />
+      <figcaption className="border-t border-ink/10 px-4 py-2.5 text-sm text-ash">{caption}</figcaption>
+    </figure>
+  )
+}
+
+function ShotGroup({
+  title,
+  lead,
+  shots,
+}: {
+  title: string
+  lead: string
+  shots: { src: string; caption: string }[]
+}) {
+  return (
+    <div className="mt-12">
+      <h4 className="font-display text-2xl italic text-pink">{title}</h4>
+      <p className="mt-1 text-ink/70">{lead}</p>
+      {shots.map((shot) => (
+        <Shot key={shot.src} src={shot.src} caption={shot.caption} />
+      ))}
+    </div>
+  )
+}
+
+function AIProjectCaseStudy({ onClose }: { onClose: () => void }) {
+  const p = aiProject
+  const cs = p.caseStudy
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose()
+    }
+    const previous = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+    window.addEventListener("keydown", onKey)
+    return () => {
+      document.body.style.overflow = previous
+      window.removeEventListener("keydown", onKey)
+    }
+  }, [onClose])
+
+  const heading = "font-display text-2xl italic text-pink"
+
+  return createPortal(
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto bg-ink/55 p-4 backdrop-blur-sm md:p-8"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${p.name} case study`}
+    >
+      <div
+        onClick={(event) => event.stopPropagation()}
+        className="my-auto w-full max-w-4xl rounded-3xl bg-cream p-6 text-ink md:p-10"
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="font-display text-lg italic text-pink">Case study · Final Year Project</p>
+            <h3 className="mt-1 font-display text-3xl text-ink md:text-4xl">{p.name}</h3>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="shrink-0 rounded-full border border-ink/20 px-3 py-1.5 text-ink transition-colors hover:border-pink hover:text-pink"
+          >
+            Close
+          </button>
+        </div>
+
+        <div className="mt-6 flex flex-wrap gap-3">
+          <a
+            href={p.live}
+            target="_blank"
+            rel="noreferrer"
+            className="rounded-full bg-pink px-5 py-2 text-sm text-cream transition-opacity hover:opacity-85"
+          >
+            View live
+          </a>
+          <a
+            href={p.github}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-2 rounded-full border border-ink/25 px-5 py-2 text-sm text-ink transition-colors hover:border-pink hover:text-pink"
+          >
+            <GitHubIcon />
+            Source on GitHub
+          </a>
+        </div>
+
+        <ul className="mt-6 flex flex-wrap gap-2">
+          {p.stack.map((tech) => (
+            <li
+              key={tech}
+              className="rounded-full border border-pink/35 bg-blush/60 px-3 py-0.5 text-xs text-plum"
+            >
+              {tech}
+            </li>
+          ))}
+        </ul>
+
+        <div className="mt-8 grid gap-8 md:grid-cols-2">
+          <div>
+            <h4 className={heading}>The problem</h4>
+            <p className="mt-2 leading-relaxed text-ink/80">{cs.problem}</p>
+          </div>
+          <div>
+            <h4 className={heading}>My approach</h4>
+            <p className="mt-2 leading-relaxed text-ink/80">{cs.approach}</p>
+          </div>
+        </div>
+
+        <div className="mt-12">
+          <h4 className={heading}>System flowchart</h4>
+          <Shot src={cs.flowchart} caption="Full flow, from selecting the customer to recording the result in the logs" />
+          <p className="mt-5 leading-relaxed text-ink/80">{cs.matching}</p>
+          <p className="mt-4 leading-relaxed text-ink/80">
+            If the OTP is not confirmed, or the match is 70% or lower, the transaction is stopped.
+            Either way, the attempt is written to the logs so every decision can be reviewed later.
+          </p>
+        </div>
+
+        <ShotGroup title="Admin" lead="The admin manages branches and their managers, and sees overall activity." shots={cs.admin} />
+
+        <div className="mt-12">
+          <h4 className={heading}>The verification process</h4>
+          <ol className="mt-4 space-y-3">
+            {cs.steps.map((step, i) => (
+              <li key={step.title} className="flex items-start gap-4 rounded-2xl border border-ink/10 bg-white/75 p-4">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-pink text-sm text-cream">
+                  {i + 1}
+                </span>
+                <span>
+                  <span className="block font-medium text-ink">{step.title}</span>
+                  <span className="mt-0.5 block text-sm leading-relaxed text-ink/65">{step.text}</span>
+                </span>
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        <ShotGroup title="Manager" lead="Managers look after cashiers and customers, and review every verification in the logs." shots={cs.manager} />
+        <ShotGroup title="Cashier" lead="The cashier runs the verification at the counter." shots={cs.cashier} />
+        <ShotGroup title="Customer" lead="Every verification starts by finding the customer." shots={cs.customer} />
+      </div>
+    </div>,
+    document.body,
+  )
+}
+
 /* ── Section ────────────────────────────────────────────────── */
 
 function Section({
@@ -615,7 +883,7 @@ function ContactForm() {
     setNote("")
 
     try {
-      const response = await fetch("/__forms.html",{
+      const response = await fetch("/", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams(data as unknown as Record<string, string>).toString(),
@@ -766,7 +1034,7 @@ function CopyEmail({ className }: { className?: string }) {
       }
     >
       <MailIcon />
-      {copied ? "Copied" : "Email"}
+      {copied ? "Copied" : "Copy email"}
     </button>
   )
 }
@@ -824,6 +1092,18 @@ export default function App() {
           <Reveal>
             <p className="max-w-[62ch] text-lg leading-[1.8] text-ink/80">{profile.intro}</p>
             <p className="mt-5 max-w-[62ch] text-lg leading-[1.8] text-ink/80">{profile.intro2}</p>
+          </Reveal>
+        </Section>
+
+        <Section
+          id="ai-project"
+          eyebrow="Featured · AI project"
+          title="AI"
+          accent="project"
+          lead="A signature verification system I built for my final year, aimed at catching forged signatures at the bank counter."
+        >
+          <Reveal>
+            <AIProjectCard />
           </Reveal>
         </Section>
 
