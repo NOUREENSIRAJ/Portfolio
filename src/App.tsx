@@ -539,7 +539,7 @@ function CaseStudyModal({ project, onClose }: { project: Project; onClose: () =>
 
 /* ── AI project (Final Year Project) ────────────────────────── */
 
-/
+
 function SignatureVisual() {
   return (
     <div className="relative h-full w-full overflow-hidden bg-gradient-to-br from-cream via-white to-blush/60">
