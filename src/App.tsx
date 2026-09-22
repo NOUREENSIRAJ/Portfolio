@@ -540,17 +540,62 @@ function CaseStudyModal({ project, onClose }: { project: Project; onClose: () =>
 
 /* ── AI project (Final Year Project) ────────────────────────── */
 
+/* Digital signature illustration — code se bani hai, koi image nahi chahiye. */
+const SIGNATURE_PATH =
+  "M18 70 C 26 34, 46 30, 44 58 C 42 80, 30 86, 34 66 C 40 44, 62 40, 66 60 C 69 74, 78 74, 84 56 C 88 44, 98 44, 97 58 C 96 72, 108 74, 116 54 C 121 42, 134 40, 136 56 C 138 70, 128 78, 124 66 C 120 54, 146 48, 162 60 C 170 66, 178 62, 186 52"
+
+function SignatureVisual() {
+  return (
+    <div className="relative flex h-full w-full items-center justify-center bg-gradient-to-br from-cream via-white to-blush/60">
+      <style>{`
+        @keyframes sig-draw { from { stroke-dashoffset: 520 } to { stroke-dashoffset: 0 } }
+        @keyframes sig-scan { 0%, 100% { transform: translateX(0) } 50% { transform: translateX(150px) } }
+        @keyframes sig-pop { 0%, 60% { opacity: 0; transform: scale(0.9) } 75%, 100% { opacity: 1; transform: scale(1) } }
+        .sig-line { stroke-dasharray: 520; animation: sig-draw 3.2s ease-in-out infinite alternate; }
+        .sig-scan { animation: sig-scan 3.2s ease-in-out infinite; }
+        .sig-badge { transform-origin: center; transform-box: fill-box; animation: sig-pop 3.2s ease-out infinite alternate; }
+        @media (prefers-reduced-motion: reduce) {
+          .sig-line, .sig-scan, .sig-badge { animation: none; stroke-dashoffset: 0; opacity: 1; }
+        }
+      `}</style>
+
+      <svg viewBox="0 0 440 275" className="h-full w-full" role="img" aria-label="Two signatures being compared by the system">
+        {/* Stored signature card */}
+        <g transform="translate(22 34)">
+          <rect width="190" height="140" rx="14" className="fill-white stroke-ink/10" strokeWidth="1.5" />
+          <text x="16" y="26" className="fill-ash" fontSize="11" letterSpacing="1.5">ON RECORD</text>
+          <line x1="16" y1="112" x2="174" y2="112" className="stroke-ink/15" strokeDasharray="3 4" />
+          <path d={SIGNATURE_PATH} transform="translate(14 22) scale(0.85)" fill="none" className="sig-line stroke-plum" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+        </g>
+
+        {/* Uploaded signature card */}
+        <g transform="translate(228 34)">
+          <rect width="190" height="140" rx="14" className="fill-white stroke-pink/50" strokeWidth="1.5" />
+          <text x="16" y="26" className="fill-pink" fontSize="11" letterSpacing="1.5">ON DOCUMENT</text>
+          <line x1="16" y1="112" x2="174" y2="112" className="stroke-ink/15" strokeDasharray="3 4" />
+          <path d={SIGNATURE_PATH} transform="translate(17 24) rotate(-2 95 70) scale(0.85)" fill="none" className="sig-line stroke-pink" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+          <g className="sig-scan">
+            <rect x="10" y="36" width="24" height="84" rx="4" className="fill-pink/15" />
+            <line x1="22" y1="36" x2="22" y2="120" className="stroke-pink" strokeWidth="1.5" />
+          </g>
+        </g>
+
+        {/* Match badge */}
+        <g className="sig-badge" transform="translate(120 196)">
+          <rect width="200" height="48" rx="24" className="fill-plum" />
+          <circle cx="26" cy="24" r="12" className="fill-pink" />
+          <path d="M20 24.5 l4 4 l8 -9" fill="none" className="stroke-cream" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+          <text x="48" y="21" className="fill-cream" fontSize="13" fontWeight="600">Match 86%</text>
+          <text x="48" y="36" className="fill-cream/70" fontSize="10.5">Verified · above 70%</text>
+        </g>
+      </svg>
+    </div>
+  )
+}
+
 function AIProjectCard() {
   const [caseOpen, setCaseOpen] = useState(false)
-  const [mouse, setMouse] = useState({ x: 0, y: 0 })
   const p = aiProject
-
-  const handleMove = (event: MouseEvent<HTMLDivElement>) => {
-    const rect = event.currentTarget.getBoundingClientRect()
-    const x = ((event.clientX - rect.left) / rect.width - 0.5) * 2
-    const y = ((event.clientY - rect.top) / rect.height - 0.5) * 2
-    setMouse({ x, y })
-  }
 
   return (
     <article className="rounded-3xl border border-pink/40 bg-white/80 p-6 shadow-xl shadow-pink/10 backdrop-blur-sm md:p-9">
@@ -624,21 +669,8 @@ function AIProjectCard() {
               {p.live.replace(/^https?:\/\//, "").replace(/\/$/, "")}
             </span>
           </div>
-          <div
-            onMouseMove={handleMove}
-            onMouseLeave={() => setMouse({ x: 0, y: 0 })}
-            className="aspect-[16/10] overflow-hidden bg-cream"
-          >
-            <img
-              src={p.cover}
-              alt={`${p.name} screenshot`}
-              loading="lazy"
-              style={{
-                transform: `scale(1.08) translate(${mouse.x * -8}px, ${mouse.y * -6}px)`,
-                transition: "transform 300ms ease-out",
-              }}
-              className="h-full w-full object-cover object-left-top"
-            />
+          <div className="aspect-[16/10] overflow-hidden bg-cream">
+            <SignatureVisual />
           </div>
         </div>
       </div>
@@ -649,9 +681,11 @@ function AIProjectCard() {
 }
 
 function Shot({ src, caption }: { src: string; caption: string }) {
+  const [failed, setFailed] = useState(false)
+  if (failed) return null
   return (
     <figure className="mt-4 overflow-hidden rounded-2xl border border-ink/10 bg-white">
-      <img src={src} alt={caption} loading="lazy" className="w-full" />
+      <img src={src} alt={caption} loading="lazy" onError={() => setFailed(true)} className="w-full" />
       <figcaption className="border-t border-ink/10 px-4 py-2.5 text-sm text-ash">{caption}</figcaption>
     </figure>
   )
@@ -1280,3 +1314,5 @@ export default function App() {
     </>
   )
 }
+
+
