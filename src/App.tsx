@@ -660,18 +660,8 @@ function AIProjectCard() {
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-2xl border border-ink/12 bg-white/85">
-          <div className="flex items-center gap-1.5 border-b border-ink/10 bg-blush/50 px-3 py-2.5">
-            <span className="h-2 w-2 rounded-full bg-pink/60" />
-            <span className="h-2 w-2 rounded-full bg-ink/15" />
-            <span className="h-2 w-2 rounded-full bg-ink/15" />
-            <span className="ml-3 truncate text-[11px] text-ash">
-              {p.live.replace(/^https?:\/\//, "").replace(/\/$/, "")}
-            </span>
-          </div>
-          <div className="aspect-[16/10] overflow-hidden bg-cream">
-            <SignatureVisual />
-          </div>
+        <div className="aspect-[16/10] overflow-hidden rounded-2xl border border-pink/30">
+          <SignatureVisual />
         </div>
       </div>
 
@@ -1314,5 +1304,3 @@ export default function App() {
     </>
   )
 }
-
-
