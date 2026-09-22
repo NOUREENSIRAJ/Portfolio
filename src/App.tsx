@@ -540,17 +540,53 @@ function CaseStudyModal({ project, onClose }: { project: Project; onClose: () =>
 
 /* ── AI project (Final Year Project) ────────────────────────── */
 
+/* Digital signature graphic — baqi projects ke graphics jaisa, code se bana hua. */
+function SignatureVisual() {
+  return (
+    <div className="relative h-full w-full overflow-hidden bg-gradient-to-br from-cream via-white to-blush/60">
+      <style>{`
+        @keyframes sig-float { 0%, 100% { transform: translateY(0) rotate(-3deg) } 50% { transform: translateY(-8px) rotate(-3deg) } }
+        @keyframes sig-dot { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(-10px) } }
+        @keyframes sig-draw { 0% { stroke-dashoffset: 40 } 45%, 100% { stroke-dashoffset: 0 } }
+        .sig-tile { animation: sig-float 5s ease-in-out infinite; }
+        .sig-dot { animation: sig-dot 6s ease-in-out infinite; }
+        .sig-stroke { stroke-dasharray: 40; animation: sig-draw 3.5s ease-in-out infinite alternate; }
+        @media (prefers-reduced-motion: reduce) {
+          .sig-tile, .sig-dot, .sig-stroke { animation: none; stroke-dashoffset: 0; }
+        }
+      `}</style>
+
+      <span className="sig-dot absolute top-[22%] left-[58%] h-3 w-3 rounded-full bg-pink/70" />
+      <span className="sig-dot absolute top-[58%] left-[18%] h-2 w-2 rounded-full bg-pink/60" style={{ animationDelay: "1.5s" }} />
+      <span className="sig-dot absolute top-[70%] right-[20%] h-1.5 w-1.5 rounded-full bg-pink/50" style={{ animationDelay: "3s" }} />
+
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="sig-tile flex h-28 w-28 items-center justify-center rounded-3xl border border-ink/5 bg-white shadow-2xl shadow-pink/25">
+          <svg
+            viewBox="0 2.5 24 24"
+            className="h-12 w-12 text-plum"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            role="img"
+            aria-label="Digital signature"
+          >
+            <path className="sig-stroke" d="M2.5 16.5c1.2-2.6 2.6-4.6 3.5-4.6 1 0-.2 3.6.9 3.6 1 0 1.8-2.6 2.8-2.6.8 0 .4 1.8 1.4 1.8.6 0 1.1-.5 1.6-1" />
+            <path d="M2.5 20h9" />
+            <path d="M14.5 14.5 20 9l2 2-5.5 5.5-2.8.8.8-2.8Z" />
+            <path d="m18.6 10.4 2 2" />
+          </svg>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function AIProjectCard() {
   const [caseOpen, setCaseOpen] = useState(false)
-  const [mouse, setMouse] = useState({ x: 0, y: 0 })
   const p = aiProject
-
-  const handleMove = (event: MouseEvent<HTMLDivElement>) => {
-    const rect = event.currentTarget.getBoundingClientRect()
-    const x = ((event.clientX - rect.left) / rect.width - 0.5) * 2
-    const y = ((event.clientY - rect.top) / rect.height - 0.5) * 2
-    setMouse({ x, y })
-  }
 
   return (
     <article className="rounded-3xl border border-pink/40 bg-white/80 p-6 shadow-xl shadow-pink/10 backdrop-blur-sm md:p-9">
@@ -624,21 +660,8 @@ function AIProjectCard() {
               {p.live.replace(/^https?:\/\//, "").replace(/\/$/, "")}
             </span>
           </div>
-          <div
-            onMouseMove={handleMove}
-            onMouseLeave={() => setMouse({ x: 0, y: 0 })}
-            className="aspect-[16/10] overflow-hidden bg-cream"
-          >
-            <img
-              src={p.cover}
-              alt={`${p.name} screenshot`}
-              loading="lazy"
-              style={{
-                transform: `scale(1.08) translate(${mouse.x * -8}px, ${mouse.y * -6}px)`,
-                transition: "transform 300ms ease-out",
-              }}
-              className="h-full w-full object-cover object-left-top"
-            />
+          <div className="aspect-[16/10] overflow-hidden">
+            <SignatureVisual />
           </div>
         </div>
       </div>
@@ -649,9 +672,11 @@ function AIProjectCard() {
 }
 
 function Shot({ src, caption }: { src: string; caption: string }) {
+  const [failed, setFailed] = useState(false)
+  if (failed) return null
   return (
     <figure className="mt-4 overflow-hidden rounded-2xl border border-ink/10 bg-white">
-      <img src={src} alt={caption} loading="lazy" className="w-full" />
+      <img src={src} alt={caption} loading="lazy" onError={() => setFailed(true)} className="w-full" />
       <figcaption className="border-t border-ink/10 px-4 py-2.5 text-sm text-ash">{caption}</figcaption>
     </figure>
   )
