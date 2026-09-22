@@ -34,7 +34,6 @@ const CATEGORY_EYEBROWS = [
   "05 · Applied ML",
 ]
 
-/** "Luna & Spice" → "luna-spice". Screenshot ka file naam isi se banta hai. */
 function slug(name: string): string {
   return name
     .toLowerCase()
@@ -540,7 +539,7 @@ function CaseStudyModal({ project, onClose }: { project: Project; onClose: () =>
 
 /* ── AI project (Final Year Project) ────────────────────────── */
 
-/* Digital signature graphic — baqi projects ke graphics jaisa, code se bana hua. */
+/
 function SignatureVisual() {
   return (
     <div className="relative h-full w-full overflow-hidden bg-gradient-to-br from-cream via-white to-blush/60">
@@ -584,7 +583,7 @@ function SignatureVisual() {
   )
 }
 
-function AIProjectCard() {
+function AIWorkCard() {
   const [caseOpen, setCaseOpen] = useState(false)
   const p = aiProject
 
