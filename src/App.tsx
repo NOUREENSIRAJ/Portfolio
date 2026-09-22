@@ -1123,7 +1123,7 @@ export default function App() {
           id="ai-project"
           eyebrow="Featured · AI project"
           title="AI"
-          accent="project"
+          accent="Work"
           lead="A signature verification system I built for my final year, aimed at catching forged signatures at the bank counter."
         >
           <Reveal>
