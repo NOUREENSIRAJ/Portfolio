@@ -1,10 +1,10 @@
 /**
  * AI Signature Verification System — Final Year Project.
- * Screenshots public/projects/ai-signature/ mein hain.
+
  */
-
-const IMG = "/projects/ai-signature"
-
+ 
+const IMG = ""
+ 
 export const aiProject = {
   name: "AI Signature Verification System",
   kind: "Final Year Project · Forgery detection for banks",
@@ -20,7 +20,7 @@ export const aiProject = {
   live: "https://smart-signature-matching.netlify.app/",
   github: "https://github.com/NOUREENSIRAJ/AI-Based-Signature-Verification-System",
   cover: `${IMG}/01-select-customer.png`,
-
+ 
   caseStudy: {
     problem:
       "In most bank branches, cheques and withdrawal forms are still checked by eye. The cashier looks at the signature, compares it with the one on file and makes a call. A careful forgery can get past a busy cashier, the result depends on who is checking, and there is rarely any record of how the decision was made.",
@@ -53,3 +53,4 @@ export const aiProject = {
     ],
   },
 }
+ 
