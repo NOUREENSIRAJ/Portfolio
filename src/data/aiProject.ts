@@ -1,7 +1,6 @@
 /**
  * AI Signature Verification System — Final Year Project.
- * Screenshots public/projects/ai-signature/ mein hain.
- */
+ * 
 
 const IMG = "/projects/ai-signature"
 
