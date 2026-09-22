@@ -583,9 +583,9 @@ function SignatureVisual() {
   )
 }
 
-function AIWorkCard() {
+function AIProjectCard() {
   const [caseOpen, setCaseOpen] = useState(false)
-  const p = aiProject
+  const p = aiWork
 
   return (
     <article className="rounded-3xl border border-pink/40 bg-white/80 p-6 shadow-xl shadow-pink/10 backdrop-blur-sm md:p-9">
@@ -702,7 +702,7 @@ function ShotGroup({
 }
 
 function AIProjectCaseStudy({ onClose }: { onClose: () => void }) {
-  const p = aiProject
+  const p = aiWork
   const cs = p.caseStudy
 
   useEffect(() => {
